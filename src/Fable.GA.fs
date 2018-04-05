@@ -4,7 +4,7 @@ open System.Text.RegularExpressions
 open Fable.Core
 open Fable.Import.JS
 
-type [<AllowNullLiteral>] [<Import("*","Tracker")>] Tracker() =
+type [<Import("*","Tracker")>] Tracker() =
     member __._trackPageview(): unit = jsNative
     member __._getName(): string = jsNative
     member __._getAccount(): string = jsNative
@@ -18,32 +18,26 @@ type [<AllowNullLiteral>] [<Import("*","Tracker")>] Tracker() =
     member __._setVisitorCookieTimeout(milliseconds: float): unit = jsNative
     member __._trackPageLoadTime(): unit = jsNative
 
-and [<AllowNullLiteral>] GoogleAnalyticsCode =
+and GoogleAnalyticsCode =
     abstract push: commandArray: ResizeArray<string> -> unit
     abstract push: func: Function -> unit
 
-and [<AllowNullLiteral>] GoogleAnalyticsTracker =
+and GoogleAnalyticsTracker =
     abstract _getTracker: account: string -> Tracker
     abstract _createTracker: opt_account: string * ?opt_name: string -> Tracker
     abstract _getTrackerByName: ?opt_name: string -> Tracker
     abstract _anonymizeIp: unit -> unit
 
-and [<AllowNullLiteral>] GoogleAnalytics =
+and GoogleAnalytics =
     abstract ``type``: string with get, set
     abstract src: string with get, set
     abstract async: bool with get, set
 
-type [<Erase>]Globals =
-    [<Global>] static member gaClassic with get(): GoogleAnalytics = jsNative and set(v: GoogleAnalytics): unit = jsNative
-    [<Global>] static member ga with get(): UniversalAnalytics.ga = jsNative and set(v: UniversalAnalytics.ga): unit = jsNative
-    [<Global>] static member _gaq with get(): GoogleAnalyticsCode = jsNative and set(v: GoogleAnalyticsCode): unit = jsNative
-    [<Global>] static member _gat with get(): GoogleAnalyticsTracker = jsNative and set(v: GoogleAnalyticsTracker): unit = jsNative
-
 module UniversalAnalytics =
-    type [<AllowNullLiteral>] [<StringEnum>] HitType =
+    type [<StringEnum>] HitType =
         | Pageview | Screenview | Event | Transaction | Item | Social | Exception | Timing
 
-    and [<AllowNullLiteral>] FieldsObject =
+    and FieldsObject =
         abstract affiliation: string option with get, set
         abstract allowAnchor: bool option with get, set
         abstract allowLinker: bool option with get, set
@@ -538,7 +532,7 @@ module UniversalAnalytics =
         abstract viewportSize: string option with get, set
         abstract hitCallback: unit -> unit
 
-    and [<AllowNullLiteral>] ga =
+    and ga =
         abstract l: float with get, set
         abstract q: ResizeArray<obj> with get, set
         [<Emit("$0($1...)")>] abstract Invoke_event: eventCategory: string * eventAction: string * ?eventLabel: string * ?eventValue: float * ?fieldsObject: FieldsObject -> unit
@@ -564,16 +558,22 @@ module UniversalAnalytics =
         abstract getByName: name: string -> Tracker
         abstract remove: name: string -> unit
 
-    and [<AllowNullLiteral>] Tracker =
+    and Tracker =
         abstract get: fieldName: string -> obj
         abstract set: fieldName: string * fieldValue: obj -> unit
         abstract set: fieldsObject: obj -> unit
         abstract send: hitType: string * [<ParamArray>] fields: obj[] -> unit
         abstract send: hitType: string * fieldsObject: obj -> unit
 
-    and [<AllowNullLiteral>] Model =
+    and Model =
         abstract get: fieldName: string -> obj
         abstract set: fieldName: string * fieldValue: obj * ?temporary: bool -> unit
         abstract set: fields: obj * ?fieldValue: obj * ?temporary: bool -> unit
 
+
+type [<Erase>]Globals =
+    [<Global>] static member gaClassic with get(): GoogleAnalytics = jsNative and set(v: GoogleAnalytics): unit = jsNative
+    [<Global>] static member ga with get(): UniversalAnalytics.ga = jsNative and set(v: UniversalAnalytics.ga): unit = jsNative
+    [<Global>] static member _gaq with get(): GoogleAnalyticsCode = jsNative and set(v: GoogleAnalyticsCode): unit = jsNative
+    [<Global>] static member _gat with get(): GoogleAnalyticsTracker = jsNative and set(v: GoogleAnalyticsTracker): unit = jsNative
 
